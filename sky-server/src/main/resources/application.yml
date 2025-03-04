@@ -55,13 +55,13 @@ sky:
   wechat:
     appid: ${sky.wechat.appid}
     secret: ${sky.wechat.secret}
-    mchid: ${}
-    mchSerialNo: ${}
-    private-key-file-path: ${}
-    api-v3-key: ${}
-    we-chat-pay-cert-file-path: ${}
-    notify-url: ${}
-    refund-notify-url: ${}
+    mchid: ${sky.wechat.mchid}
+    mchSerialNo: ${sky.wechat.mchSerialNo}
+    private-key-file-path: ${sky.wechat.private-key-file-path}
+    api-v3-key: ${sky.wechat.api-v3-key}
+    we-chat-pay-cert-file-path: ${sky.wechat.we-chat-pay-cert-file-path}
+    notify-url: ${sky.wechat.notify-url}
+    refund-notify-url: ${sky.wechat.notify-url}
   shop:
     address: 北京市海定区上地十街10号
   baidu:

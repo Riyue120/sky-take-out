@@ -20,6 +20,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -48,6 +49,8 @@ public class OrderServicelmpl implements OrderService {
     private UserMapper userMapper;
     @Autowired
     private WeChatPayUtil weChatPayUtil;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     @Value("${sky.shop.address}")
     private String shopAddress;
@@ -155,6 +158,13 @@ public class OrderServicelmpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+        // 通知商家
+        Map map = new HashMap();
+        map.put("type", 1);
+        map.put("orderId", ordersDB.getId());
+        map.put("content", "订单号：" + outTradeNo + "，请及时处理");
+        String json = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
     }
     /**
      * 用户端订单分页查询
@@ -538,5 +548,21 @@ public class OrderServicelmpl implements OrderService {
             //配送距离超过5000米
             throw new OrderBusinessException("超出配送范围");
         }
+    }
+    /**
+     * 客户催单
+     * @param id
+     */
+    public void reminder(Long id){
+        Orders orders = orderMapper.getById(id);
+        if(orders == null){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        Map map = new HashMap<>();
+        map.put("type",2); // 1来单提醒， 2客户催单
+        map.put("orderId",id);
+        map.put("content","订单号"+orders.getNumber()+"，请尽快处理");
+
+        webSocketServer.sendToAllClient(JSON.toJSONString(map));
     }
 }
